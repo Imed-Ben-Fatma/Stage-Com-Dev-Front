@@ -4,15 +4,18 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { redirect } from 'next/navigation'
-import { load } from'../../components/load'
+import Loading from '@/app/components/pageLoading';
+import { useRouter } from 'next/navigation'
+
 
 export default function UpdateProfile() {
+
     const [userData, setUserData] = useState(null);
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [avatar, setAvatar] = useState(null);
     const [status, setStatus] = useState(null)
-
+    const router = useRouter()
     useEffect(() => {
         const fetchData = async () => {
             const token = Cookies.get('token');
@@ -25,9 +28,9 @@ export default function UpdateProfile() {
                 const response = await axios.get("http://localhost:3000/users/profile", {
                     headers: { 'Authorization': token }
                 });
-                setUserData(response.data.data);
-                setEmail(response.data.data.email);
-                setName(response.data.data.name);
+                setUserData(response.data);
+                setEmail(response.data.email);
+                setName(response.data.name);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -52,26 +55,26 @@ export default function UpdateProfile() {
         }
 
         try {
-            const response = await axios.put("http://localhost:3000/users/update", formData, {
+            const response = await axios.patch("http://localhost:3000/users/update", formData, {
                 headers: { 
                     'Authorization': token,
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            setUserData(response.data.data);
-            setStatus(response.status)
-            //redirect('/profile/update')
+
+            router.push('/profile?SuccessMessage=Votre profil a été mis à jour.')
         } catch (error) {
             console.error("Error updating data:", error);
         }
     };
 
     if (!userData) {
-        return load(); 
+        return (<div><Loading/></div>); 
     }
 
     return (
         <div className="w-full h-screen dark:bg-gray-950 px-10 pt-10">
+
             <div className="relative mt-16 mb-32 max-w-sm mx-auto bg-white dark:bg-gray-900 rounded-lg ">
                 <div className="rounded overflow-hidden shadow-md">
                     <div className="absolute -mt-20 w-full flex justify-center">

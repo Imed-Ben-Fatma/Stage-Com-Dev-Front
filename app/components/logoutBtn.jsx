@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 export function logoutBtn() {
     const handleLogout = () => {
         Cookies.remove('token');
+        
     };
 
     return (

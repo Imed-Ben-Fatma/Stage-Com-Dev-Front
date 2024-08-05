@@ -1,9 +1,10 @@
 
 "use client";
-
+import './styles.css'
 import { useState } from 'react';
 import axios from 'axios';
 import { redirect } from 'next/navigation'
+import Link from 'next/link';
 
 
 
@@ -13,7 +14,9 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [name, setName] = useState('');
+    const [telephone, setTelephone] = useState('');
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const [status, setStatus] = useState(null)
 
 
@@ -27,12 +30,16 @@ export default function LoginPage() {
                     {
                         email: email,
                         password: password,
-                        name: name
+                        name: name,
+                        telephone: telephone
                     }
                 });
                 setStatus(response.status)
                 setError(null);
-            }
+
+                setSuccessMessage("Vérifiez votre email pour confirmer votre compte.")
+                
+            }else
             setError('verify your password');
         } catch (err) {
             setError('Sign up failed');
@@ -41,14 +48,19 @@ export default function LoginPage() {
     };
 
     return (
-        <section class="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
+        <section class="min-h-screen flex items-center justify-center w-full py-5 bg-bg-image">
+
+            <Link href={'/signup/owner'} className=' w-[13rem] p-2 shadow-lg text-slate-900 font-semibold text-base text-center bg-gray-200 hover:bg-gray-300 rounded-lg absolute right-6 top-20' >
+                Si vous êtes propriétaire <span> inscrivez-vous ici</span>
+            </Link>
             <div
                 class="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-900 ">
-                <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                
+                <div class=" space-y-4 md:space-y-6 px-8 py-6">
                 <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Create an
                     account
                 </h1>
-                <form class="space-y-4 md:space-y-6" method="POST" onSubmit={handleSubmit} >
+                <form class="space-y-3" method="POST" onSubmit={handleSubmit} >
                     <div>
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your full name</label>
                         <input type="text" name="name" id="name" 
@@ -61,12 +73,22 @@ export default function LoginPage() {
                     </div>
                     <div>
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                        <input type="text" name="email" id="username" 
+                        <input type="text" name="email" id="email" 
                             className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-indigo-700"
                             placeholder="imad.benfatma98@gmail.com" 
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label for="telephone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Telephone</label>
+                        <input type="text" name="telephone" id="telephone" 
+                            className="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-indigo-700"
+                            placeholder="99 999 999" 
+                            required
+                            value={telephone}
+                            onChange={(e) => setTelephone(e.target.value)}
                         />
                     </div>
                     <div>
@@ -94,9 +116,28 @@ export default function LoginPage() {
                         class="font-medium text-blue-600 hover:underline dark:text-blue-500" href="/login">Sign in here</a>
                     </p>
                 </form>
-                {status==200 && (
-                   redirect('/')
-                )}
+
+                {successMessage &&
+                    <div className="flex items-center p-4 mb-4 text-sm text-green-600 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-green-400 mt-3" role="alert">
+                        <svg className="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                        </svg>
+                        <div>
+                            <span className="font-medium">{successMessage}</span>
+                        </div>
+                    </div>
+                }
+
+                {error &&
+                    <div className="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 mt-3" role="alert">
+                        <svg className="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                        </svg>
+                        <div>
+                            <span className="font-medium">{error}</span>
+                        </div>
+                    </div>
+                }
                 </div>
             </div>
         </section>

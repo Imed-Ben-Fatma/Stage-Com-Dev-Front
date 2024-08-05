@@ -1,19 +1,25 @@
 
-"use client";
+"use client"
+import './styles.css'
+import { AlertSuccess} from "@/app/components/alerts";
+import { useSearchParams } from "next/navigation";
 
 import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 
 
 export default function LoginPage() {
+    const searchParams = useSearchParams();
+    const successMessage = searchParams.get("SuccessMessage");
+  
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
-
+    const router = useRouter()
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -24,20 +30,28 @@ export default function LoginPage() {
                     password: password
                 }
             });
-            setUserData(response.data.status.data.user);
+            
             const authToken = response.headers['authorization'];
-            Cookies.set('token', authToken, { expires: 1 });
+            Cookies.set('token', authToken, { expires: 1});
+            Cookies.set('role', response.data.role, { expires: 1});
             setError(null);
+            if (response.data.role==='owner'){            
+                router.push('/owner/monPosts?SuccessMessage=Login successful');
+            }else if (response.data.role==='admin') {
+                router.push('/admin/allOwners?SuccessMessage=Login successful');
+            }else if (response.data.role==='user') {
+                router.push('/user/monReservation?SuccessMessage=Login successful');
+            }
         } catch (err) {
             setError('Login failed');
-            setUserData(null);
-            setToken(null);
+            
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
-            <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-md">
+        <div className="min-h-screen flex items-center justify-center w-full bg-bg-image ">
+            
+            <div className=" w-1/3 bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-md">
                 <h2 className="text-2xl font-bold text-center mb-4 dark:text-gray-200">Welcome Back! </h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
@@ -61,9 +75,7 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                        <a href="#" className="text-xs text-gray-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Forgot Password?
-                        </a>
+
                     </div>
                     <div className=" justify-items-end mb-4">
 
@@ -87,10 +99,7 @@ export default function LoginPage() {
                         </div>
                     </div>
                 }
-                {userData && (
-                   redirect('/profile')
-                )}
-  
+            
             </div>
         </div>
     );
