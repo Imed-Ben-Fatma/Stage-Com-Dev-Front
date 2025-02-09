@@ -33,6 +33,7 @@ export default function LoginPage() {
             
             const authToken = response.headers['authorization'];
             Cookies.set('token', authToken, { expires: 1});
+            Cookies.set('userId', response.data.userId, { expires: 1});
             Cookies.set('role', response.data.role, { expires: 1});
             setError(null);
             if (response.data.role==='owner'){            

@@ -129,3 +129,19 @@ export const deleteUser = async (id) => {
     throw error;
   }
 };
+
+
+export const postByUser = async () => {
+  try {
+    const authToken = Cookies.get('token');
+    const response = await axios.get(`${API_BASE_URL}/posts_by_user`, {
+      headers: {
+        'Authorization': `${authToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error delete user:', error);
+    throw error;
+  }
+};

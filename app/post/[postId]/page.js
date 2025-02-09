@@ -7,6 +7,7 @@ import { ownerPoste } from "../../components/ownerPoste";
 import { posteParames } from '../../components/posteParams';
 import { fetchPostDetailes,archiverPost,blockedPost ,deletePost} from "@/api/posts";
 import { useEffect,useState } from 'react';
+import {postByUser} from "@/api/user";
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import Loading from "@/app/components/pageLoading";
@@ -31,6 +32,7 @@ export default function PosteDetailes({ params }) {
   const handleClose = () => setOpen(false); 
 
   const [post, setPost] = useState();
+  const [postsByUser, setPostsByUser] = useState();
   const [status, setStatus] = useState();
   const router = useRouter();
   
@@ -38,7 +40,12 @@ export default function PosteDetailes({ params }) {
     const fetchData = async () => {
       try {
         const response = await fetchPostDetailes(params.postId);
+        if (Cookies.get("role")=="owner") {
+        const reponse1 = await postByUser();
+        setPostsByUser(reponse1);
+      }
         setPost(response);
+        
       } catch (error) {
         console.error('Error fetching post details:', error);
       }
@@ -104,7 +111,7 @@ export default function PosteDetailes({ params }) {
       <div className="mx-5  p-4  flex place-content-between items-center">
         <h2 className="text-5xl font-bold tracking-wider">{post.titre}</h2>
         {
-          ((Cookies.get("role")==="owner")||(Cookies.get("role")==="admin"))&& (Cookies.get("token"))?
+          (((Cookies.get("role")==="owner") && postsByUser.some((p)=> p.id === post.id))||(Cookies.get("role")==="admin"))&& (Cookies.get("token"))?
             (<div className=" relative w-1/2 pb-8" >
               <div className="absolute right-0 " >
               {(Cookies.get("role")==="admin") ? (
